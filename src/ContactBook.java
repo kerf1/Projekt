@@ -1,16 +1,10 @@
 import java.util.*;
 import java.io.*;
-public class Contacts {
+import java.util.ArrayList;
+public class ContactBook {
+    protected static ArrayList contactsArrayList = new ArrayList();
     private static final String PROMPT = ">";
     private static boolean runSwitch = true;
-    private static ArrayList<Person> contactsArrayList = new ArrayList<Person>();
-    private static String getSignature(int i) {
-            StringTokenizer splitString = new StringTokenizer(contactsArrayList.get(i).toString(), "|");
-            splitString.nextToken();
-            splitString.nextToken();
-            String personSignature = splitString.nextToken();
-        return personSignature;
-    }
     public static void addContact(){
         Scanner userInput = new Scanner(System.in);
         Adress adressObject = new Adress();
@@ -20,7 +14,10 @@ public class Contacts {
         personObject.setFirstName(userInput.nextLine());
         System.out.println("Efternamn: ");
         personObject.setLastName(userInput.nextLine());
-        personObject.generateSignature();
+
+        //String sign = personObject.generateSignature();
+        personObject.setSignature(personObject.generateSignature());
+
         System.out.println("Längd: ");
         personObject.setLength(Integer.parseInt(userInput.nextLine()));
         System.out.println("Postadress: ");
@@ -34,7 +31,7 @@ public class Contacts {
         contactsArrayList.add(personObject);
         printList(contactsArrayList);
     }
-    public static void searchContact() {
+    public static void searchContact(ArrayList<Person> contactsArrayList) {
         System.out.print("Sök efter en person(signatur): ");
         Scanner userInput = new Scanner(System.in);
         String searchSignature = userInput.nextLine();
@@ -47,7 +44,6 @@ public class Contacts {
             splitString.nextToken();
             splitString.nextToken();
             String personSignature = splitString.nextToken();
-
             if (personSignature.contains(searchSignature)) {
                 contactsArrayList.remove(i);
                 //contactsArrayList.remove(i);
@@ -63,7 +59,7 @@ public class Contacts {
             }
         }
     }
-    public static void sortListByFirstName() {
+    public static void sortListByFirstName(ArrayList<Person> contactsArrayList) {
         contactsArrayList.sort(new Comparator<Person>() {
             @Override
             public int compare(Person person1, Person person2) {
@@ -71,7 +67,7 @@ public class Contacts {
             }
         });
     }
-    public static void sortListByLastName(){
+    public static void sortListByLastName(ArrayList<Person> contactsArrayList){
         contactsArrayList.sort(new Comparator<Person>() {
             @Override
             public int compare(Person person1, Person person2) {
@@ -82,7 +78,7 @@ public class Contacts {
             }
         });
     }
-    public static void sortListBySignature() {
+    public static void sortListBySignature(ArrayList<Person> contactsArrayList) {
         contactsArrayList.sort(new Comparator<Person>() {
             @Override
             public int compare(Person person1, Person person2) {
@@ -90,7 +86,7 @@ public class Contacts {
             }
         });
         }
-    public static void sortListByLength() {
+    public static void sortListByLength(ArrayList<Person> contactsArrayList) {
         contactsArrayList.sort(new Comparator<Person>() {
             @Override
             public int compare(Person p1, Person p2) {
@@ -98,7 +94,7 @@ public class Contacts {
             }
         });
     }
-    public static void makeListToRandomOrder() {
+    public static void makeListToRandomOrder(ArrayList<Person> contactsArrayList) {
         contactsArrayList.sort(new Comparator<Person>() {
             @Override
             public int compare(Person person1, Person person2) {
@@ -107,72 +103,43 @@ public class Contacts {
             }
         });
     }
-    public static void saveListToFile() throws IOException {
-        //System.out.println(contactsArrayList.size());
-
-        Scanner input = new Scanner(System.in);
-        System.out.print("Ange namn på filen: ");
-        String fileName = input.nextLine();
-        FileWriter fw = new FileWriter(fileName);
-        BufferedWriter bw = new BufferedWriter(fw);
-        PrintWriter output = new PrintWriter(bw);
-
-        for (int i = 0; i < contactsArrayList.size(); i++) {
-            output.println(contactsArrayList.get(i));
-        }
-        output.close();
-    }
-    public static void loadListFromFile() throws FileNotFoundException {
-        String path;
-        /*
-        if(args.length == 0){
-            path = "C:/Users/hanne/Desktop/JavaI/Lektioner/6/Upg2/src/wordlist1.txt";
-        }else{
-            path = args[0];
-        }
-        */
-        /*
-        Scanner userInput = new Scanner(System.in);
-        */
-
-        path = "C:\\Users\\hanne\\Desktop\\JavaI\\Projekt\\data.txt";
-        Scanner file = new Scanner(new File(path));
-
-        while (file.hasNextLine()){
-            //String firsName = file.next();
-            //String lastName = file.next();
-            //int length = Integer.parseInt(file.next());
-            StringTokenizer fileInput = new StringTokenizer(file.nextLine(),"|");
-            while (fileInput.hasMoreTokens()){
-                Person personObjekt = new Person();
-                Adress adressObjekt = new Adress();
-
-                personObjekt.setFirstName(fileInput.nextToken());
-                personObjekt.setLastName(fileInput.nextToken());
-                personObjekt.setSignature(fileInput.nextToken());
-                //personObjekt.generateSignature();
-                //String signature = fileInput.nextToken();
-                personObjekt.setLength(Integer.parseInt(fileInput.nextToken()));
-                adressObjekt.setPostAdress(fileInput.nextToken());
-                adressObjekt.setPostNumber(fileInput.nextToken());
-                adressObjekt.setPostCity(fileInput.nextToken());
-                personObjekt.setAdress(adressObjekt);
-                contactsArrayList.add(personObjekt);
-            }
-        }
-        file.close();
-    }
+    /*
     public String generateSignature(){
+        StringBuilder signatureFirst = new StringBuilder(Person.getFirstName().toLowerCase());
+        StringBuilder signatureLast = new StringBuilder(Person.getLastName().toLowerCase());
+        System.out.println(signatureFirst);
+        System.out.println(signatureLast);
+        while (signatureFirst.length() < 3)
+            signatureFirst.append("x");
+        while (signatureLast.length() < 3)
+            signatureLast.append("x");
+
+        String signature = String.valueOf(signatureFirst.append(signatureLast + "00"));
+
+            for (int i = 0; i < contactsArrayList.size(); i++){
+                if(signature.equals(getSignature(i)) ) {
+                    System.out.println(getSignature(i));
+                    int newEndingDigits = Integer.parseInt(signature.substring(signature.length()-2, signature.length()) + 1);
+                    signature = signatureFirst.substring(0,3) + signatureLast.substring(0,3) + newEndingDigits;
+                }
+            }
+        return signature;
+    }
+    */
+    /*
+    public String generateSignature() {
         String signatureFirst = Person.getFirstName().toLowerCase();
         String signatureLast = Person.getLastName().toLowerCase();
         while (signatureFirst.length() < 3)
             signatureFirst = signatureFirst + "x";
         while (signatureLast.length() < 3)
             signatureLast = signatureLast + "x";
-        //String signature = signatureFirst.substring(0,3) + signatureLast.substring(0,3);
+        String signature = signatureFirst.substring(0, 3) + signatureLast.substring(0, 3);
 
-        return signatureFirst.substring(0,3) + signatureLast.substring(0,3);
+        return signature;
     }
+
+     */
     public static void printMenu() {
         System.out.println(
         "1 - Lägg till en person\n" +
@@ -193,7 +160,7 @@ public class Contacts {
             System.out.println(contactsArrayList.get(i));
         }
     }
-    public static void switchMenu () throws IOException {
+    public static void runMenu() throws IOException {
             Scanner userInput = new Scanner(System.in);
             do {
                 printMenu();
@@ -207,27 +174,27 @@ public class Contacts {
                         printList(contactsArrayList);
                     }
                     case 3 -> {
-                        searchContact();
+                        searchContact(contactsArrayList);
                     }
                     case 4 -> {
-                        sortListByFirstName();
+                        sortListByFirstName(contactsArrayList);
                     }
                     case 5 -> {
-                        sortListByLastName();
+                        sortListByLastName(contactsArrayList);
                     }
                     case 6 ->{
-                        sortListBySignature();
+                        sortListBySignature(contactsArrayList);
                     }
                     case 7 ->{
-                        sortListByLength();
+                        sortListByLength(contactsArrayList);
                     }
                     case 8 -> {
-                        makeListToRandomOrder();
+                        makeListToRandomOrder(contactsArrayList);
                     }
                     case 9 ->
-                        saveListToFile();
+                        FileTransfer.saveListToFile(contactsArrayList);
                     case 10 -> {
-                        loadListFromFile();
+                        FileTransfer.loadListFromFile(contactsArrayList);
                     }
                     case 0 -> {
                         System.out.println("Kontaktboken avslutas");
@@ -239,8 +206,4 @@ public class Contacts {
             while (runSwitch);
             System.exit(0);
     }
-    public static void main (String[]args) throws IOException {
-        switchMenu();
-    }
-
 }
